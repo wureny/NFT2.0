@@ -15,6 +15,7 @@ module sui_royale::sui_royale {
     }
 
     fun init(ctx: &mut TxContext) {
+        //TODO 定义错误码
 
     }
 
@@ -31,17 +32,29 @@ module sui_royale::sui_royale {
         transfer(nft2,sender(ctx));
     }
 
-    public entry fun transfer_with_royale(to: address, nft: NFT2, ctx: &mut TxContext) {
+    //public entry fun transfer_with_royale(to: address, nft: NFT2, ctx: &mut TxContext) {
         //TODO
-    }
 
-    public entry fun transfer_without_royale(to: address, nft: NFT2, ctx: &mut TxContext) {
+    //}
+
+    public entry fun transfer_without_royale(to: address, mut nft: NFT2, ctx: &mut TxContext) {
         nft.owner=to;
         transfer(nft,to);
     }
 
     public entry fun reclaim(nft: NFT2,ctx: &mut TxContext) {
-       //TODO
-        transfer(nft,nft.title_owner);
+        assert!(nft.title_owner==sender(ctx),1);
+        let to =nft.title_owner;
+        transfer(nft,to);
     }
+
+    public entry fun getRoyale(nft: &NFT2,ctx: &mut TxContext) {}
+
+    public entry fun getTitleOwner(nft: &NFT2,ctx: &mut TxContext) {}
+
+    public entry fun getCreator(nft: &NFT2,ctx: &mut TxContext) {}
+
+    public entry fun getOwner(nft: &NFT2,ctx: &mut TxContext) {}
+
+    public entry fun changeRoyale(nft: &mut NFT2,ctx: &mut TxContext) {}
 }
