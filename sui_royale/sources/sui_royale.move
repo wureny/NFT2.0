@@ -1,8 +1,11 @@
 module sui_royale::sui_royale {
     use std::string::{String};
+    use sui::coin;
+    use sui::coin::Coin;
     use sui::object;
     use sui::transfer::{ public_transfer};
     use sui::tx_context::sender;
+    use sui::sui::SUI;
 
     public struct NFT2 has key,store{
         id: UID,
@@ -32,15 +35,21 @@ module sui_royale::sui_royale {
         public_transfer(nft2,sender(ctx));
     }
 
-    /*public entry fun transfer_with_royale(to: address, nft: NFT2, ctx: &mut TxContext) {
-        let b = coin::balance<SUI>(to);
-    let bal = balance::value<SUI>(to);
-   // assert!();
+    public entry fun transfer_with_royale(to: address, nft: &mut NFT2, mut payment:Coin<SUI>, ctx: &mut TxContext) {
+        assert!(sender(ctx) == nft.owner, 1);
+        assert!(coin::value(&payment) >= nft.royale_points, 2);
 
+        let royalty = coin::split(&mut payment, nft.royale_points, ctx);
+        transfer::public_transfer(royalty, nft.creator);
+
+        transfer::public_transfer(payment, sender(ctx));
+
+        nft.owner = to;
+        nft.title_owner = to;
     }
-    */
 
     public entry fun transfer_without_royale(to: address, mut nft: &mut NFT2, ctx: &mut TxContext) {
+        assert!(sender(ctx)==nft.owner,1);
         nft.owner=to;
     }
 
