@@ -3,7 +3,7 @@ module sui_royale::sui_royale {
     use sui::coin;
     use sui::coin::Coin;
     use sui::object;
-    use sui::transfer::{ public_transfer};
+    use sui::transfer::{share_object};
     use sui::tx_context::sender;
     use sui::sui::SUI;
 
@@ -32,7 +32,7 @@ module sui_royale::sui_royale {
             title_owner: sender(ctx),
             owner: sender(ctx)
         };
-        public_transfer(nft2,sender(ctx));
+        share_object(nft2);
     }
 
     public entry fun transfer_with_royale(to: address, nft: &mut NFT2, mut payment:Coin<SUI>, ctx: &mut TxContext) {
@@ -78,6 +78,5 @@ module sui_royale::sui_royale {
     public entry fun changeRoyale(nft: &mut NFT2,roy: u64, ctx: &mut TxContext) {
         assert!(sender(ctx)==nft.creator,1);
         nft.royale_points=roy;
-
     }
 }
