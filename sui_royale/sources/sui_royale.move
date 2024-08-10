@@ -17,9 +17,10 @@ module sui_royale::sui_royale {
         owner: address
     }
 
-    fun init(ctx: &mut TxContext) {
-        //TODO 定义错误码
+    const PERMISSION_DENIED:u8=1;
+    const BALANCE_INSUFFICIENT:u8=2;
 
+    fun init(ctx: &mut TxContext) {
     }
 
     public entry fun mint(name_: String, imagrUrl: String,royale_points_: u64,ctx: &mut TxContext) {
@@ -36,8 +37,8 @@ module sui_royale::sui_royale {
     }
 
     public entry fun transfer_with_royale(to: address, nft: &mut NFT2, mut payment:Coin<SUI>, ctx: &mut TxContext) {
-        assert!(sender(ctx) == nft.owner, 1);
-        assert!(coin::value(&payment) >= nft.royale_points, 2);
+        assert!(sender(ctx) == nft.owner,PERMISSION_DENIED);
+        assert!(coin::value(&payment) >= nft.royale_points, BALANCE_INSUFFICIENT);
 
         let royalty = coin::split(&mut payment, nft.royale_points, ctx);
         transfer::public_transfer(royalty, nft.creator);
@@ -49,12 +50,12 @@ module sui_royale::sui_royale {
     }
 
     public entry fun transfer_without_royale(to: address, mut nft: &mut NFT2, ctx: &mut TxContext) {
-        assert!(sender(ctx)==nft.owner,1);
+        assert!(sender(ctx)==nft.owner,PERMISSION_DENIED);
         nft.owner=to;
     }
 
     public entry fun reclaim(nft: &mut NFT2,ctx: &mut TxContext) {
-        assert!(nft.title_owner==sender(ctx),1);
+        assert!(nft.title_owner==sender(ctx),PERMISSION_DENIED);
         let to =nft.title_owner;
         nft.owner=to;
     }
@@ -76,7 +77,7 @@ module sui_royale::sui_royale {
     }
 
     public entry fun changeRoyale(nft: &mut NFT2,roy: u64, ctx: &mut TxContext) {
-        assert!(sender(ctx)==nft.creator,1);
+        assert!(sender(ctx)==nft.creator,PERMISSION_DENIED);
         nft.royale_points=roy;
     }
 }
